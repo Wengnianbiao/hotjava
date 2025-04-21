@@ -1,0 +1,28 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <!--
+        Servlet 容器的入口配置
+        定义了一个名为 "dispatcher" 的 Servlet，使用 GPDispatcherServlet 类处理请求
+        配置了初始化参数 contextConfigLocation，指定了配置文件路径
+        设置 load-on-startup 为 1，表示容器启动时立即加载该 Servlet
+    -->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>com.java.biao.spring.servlet.GPDispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:application.properties</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>
