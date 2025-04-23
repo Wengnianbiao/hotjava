@@ -124,7 +124,7 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
             try {
                 // 会出现为Null的情况，而且这样还会出现循环依赖的问题，此处暂时不解决这个问题
                 if (this.factoryBeanInstanceCache.get(autowiredBeanName) == null) {
-                    continue;
+                    getBean(autowiredBeanName);
                 }
                 field.set(instance, this.factoryBeanInstanceCache.get(autowiredBeanName).getWrappedInstance());
             } catch (Exception e) {

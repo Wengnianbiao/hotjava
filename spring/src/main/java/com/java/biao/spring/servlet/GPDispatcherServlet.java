@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +41,10 @@ public class GPDispatcherServlet extends HttpServlet {
     private List<GPViewResolver> viewResolvers = new ArrayList<>();
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        // 初始化ioc容器
+    public void init(ServletConfig config) {
+        // 初始化ioc容器,MVC的前提就是已经把容器初始化完毕，即把相关的组件都已经放置到容器中了
         applicationContext = new GPApplicationContext(config.getInitParameter(LOCATION));
-
+        // 初始化各种策略，本质是根据注解来解析成key-value的映射关系
         initStrategies(applicationContext);
     }
 
@@ -56,7 +55,7 @@ public class GPDispatcherServlet extends HttpServlet {
         initLocaleResolver(applicationContext);
         // 主题解析，针对请求主题
         initThemeResolver(applicationContext);
-        // 最重要的请求映射处理器,
+        // 最重要的请求映射处理器
         initHandlerMappings(applicationContext);
         // 请求参数解析器，针对请求参数进行动态适配
         initHandlerAdapters(applicationContext);
@@ -66,7 +65,7 @@ public class GPDispatcherServlet extends HttpServlet {
         initRequestToViewNameTranslator(applicationContext);
         // 逻辑视图解析到具体视图解析器
         initViewResolvers(applicationContext);
-        // flashMap管理器,不知道是什么的
+        // flashMap管理器,不知道是什么的,不过从名称看估计和Flash相关
         initFlashMapManager(applicationContext);
     }
 
@@ -77,6 +76,7 @@ public class GPDispatcherServlet extends HttpServlet {
         // ViewResolver也算一种策略，根据不同的请求选择不同的模板引擎来进行页面的渲染
         String templateRoot = applicationContext.getConfig().getProperty("templateRoot");
         String templateRootPath = this.getClass().getClassLoader().getResource(templateRoot).getFile();
+
         File templateRootDir = new File(templateRootPath);
         String[] templates = templateRootDir.list();
         for (int i = 0; i < templates.length; i ++) {
@@ -121,7 +121,7 @@ public class GPDispatcherServlet extends HttpServlet {
                     baseUrl = requestMapping.value();
                 }
 
-                // 扫描所有的public方法后进行注册
+                // 扫描当前controller类下所有的public方法后进行注册
                 Method[] methods = clazz.getMethods();
                 for (Method method : methods) {
                     if (!method.isAnnotationPresent(GPRequestMapping.class)) {
@@ -130,10 +130,12 @@ public class GPDispatcherServlet extends HttpServlet {
 
                     GPRequestMapping requestMapping = method.getAnnotation(GPRequestMapping.class);
                     String regex = ("/" + baseUrl + "/" + requestMapping.value())
+                            // 应当是匹配所有，所以用.*
                             .replaceAll("\\*", ".*")
+                            // 将多个/换成一个/
                             .replaceAll("/+", "/");
                     Pattern pattern = Pattern.compile(regex);
-                    // 将url和method进行映射
+                    // 将url和method的正则表达式进行映射
                     this.handlerMapping.add(new GPHandlerMapping(controller, method, pattern));
                     log.info("having register mapping:" + regex + "->" + method);
                 }
@@ -154,6 +156,7 @@ public class GPDispatcherServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // servlet容器会将http请求到到达的doGet方法，所以这里重写doGet方法，调用doPost方法
         this.doPost(req, resp);
     }
 
@@ -162,10 +165,6 @@ public class GPDispatcherServlet extends HttpServlet {
         try {
             doDispatch(req, resp);
         } catch (Exception e) {
-            resp.getWriter().write("<font size='25' color='blue'>500 Exception</font><br/>Details:<br/>"
-                    + Arrays.toString(e.getStackTrace()).replaceAll("\\[|\\]", "")
-                    .replaceAll("\\s+", "\r\n")
-                    + "<font color='green'><i>Copyright@Biao_EDU</i></font>");
             e.printStackTrace();
         }
     }
@@ -178,10 +177,10 @@ public class GPDispatcherServlet extends HttpServlet {
             processDispatchResult(req, resp, new GPModelAndView("404"));
         }
         //2、准备调用前的参数
-        GPHandlerAdapter ha = getHandlerAdapter(handler);
+        GPHandlerAdapter handlerAdapter = getHandlerAdapter(handler);
 
         //3、真正的调用方法,返回ModelAndView存储了要穿页面上值，和页面模板的名称
-        GPModelAndView mv = ha.handle(req, resp, handler);
+        GPModelAndView mv = handlerAdapter.handle(req, resp, handler);
 
         //4、真正的输出
         processDispatchResult(req, resp, mv);

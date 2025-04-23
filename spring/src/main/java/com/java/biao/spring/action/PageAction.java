@@ -14,7 +14,7 @@ import java.util.Map;
 @GPRequestMapping("/")
 public class PageAction {
 
-    @GPAutowired
+    @GPAutowired("queryServiceImpl")
     IQueryService queryService;
 
     @GPRequestMapping("/first.html")

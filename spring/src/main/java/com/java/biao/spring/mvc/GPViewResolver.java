@@ -20,6 +20,7 @@ public class GPViewResolver {
         this.templateRootDir = new File(templateRootPath);
     }
 
+    // 视图本质上是文件流中的html文件
     public GPView resolveViewName(String viewName, Locale locale) throws Exception {
         this.viewName = viewName;
         if (viewName == null || viewName.trim().isEmpty()) {

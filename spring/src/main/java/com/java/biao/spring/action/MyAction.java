@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 @GPRequestMapping("/web")
 public class MyAction {
 
-    @GPAutowired
+    @GPAutowired("queryServiceImpl")
     IQueryService queryService;
 
-    @GPAutowired
+    @GPAutowired("modifyServiceImpl")
     IModifyService modifyService;
 
 
@@ -53,6 +53,11 @@ public class MyAction {
 
     private GPModelAndView out(HttpServletResponse response, String str) {
         try {
+            // 设置响应的字符编码为 UTF-8
+            response.setCharacterEncoding("UTF-8");
+            // 设置 Content-Type 头，确保客户端使用 UTF-8 解码
+            response.setContentType("application/json;charset=UTF-8"); // 或 "text/plain;charset=UTF-8"
+            // 写入响应内容
             response.getWriter().write(str);
         } catch (Exception e) {
             e.printStackTrace();
