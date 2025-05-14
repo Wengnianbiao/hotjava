@@ -4,10 +4,11 @@ import com.java.biao.spring.annotation.GPService;
 import com.java.biao.spring.service.IModifyService;
 
 @GPService
-public class ModifyServiceImpl implements IModifyService {
+public class ModifyService implements IModifyService {
     @Override
     public String add(String name, String addr) throws Exception {
-        return "modifyService add,name=" + name + ",addr=" + addr;
+        throw new Exception("抛出异常,测试切面通知是否生效!");
+//        return "modifyService add,name=" + name + ",addr=" + addr;
     }
 
     @Override

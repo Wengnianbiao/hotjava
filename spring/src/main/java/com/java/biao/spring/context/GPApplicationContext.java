@@ -2,8 +2,12 @@ package com.java.biao.spring.context;
 
 import com.java.biao.spring.annotation.GPAutowired;
 import com.java.biao.spring.annotation.GPController;
-import com.java.biao.spring.annotation.GPIgnore;
 import com.java.biao.spring.annotation.GPService;
+import com.java.biao.spring.aop.GPAopProxy;
+import com.java.biao.spring.aop.GPCglibAopProxy;
+import com.java.biao.spring.aop.GPJdkDynamicAopProxy;
+import com.java.biao.spring.aop.config.GPAopConfig;
+import com.java.biao.spring.aop.support.GPAdvisedSupport;
 import com.java.biao.spring.beans.GPBeanWrapper;
 import com.java.biao.spring.config.GPBeanDefinition;
 import com.java.biao.spring.config.GPBeanPostProcessor;
@@ -144,7 +148,23 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
                 // 因为是需要反射实例化，所以需要类提供无参构造方法
                 Class<?> clazz = Class.forName(className);
                 instance = clazz.newInstance();
+
+                // 初始化AOP配置信息,去判断需不需要为这个类增强,这里是每个类都需要初始化配置
+                // Spring源码不可能这么做吧？
+                GPAdvisedSupport aopConfig = initializationAopConfig(beanDefinition);
+                // 在这里触发了初始化,这里的思想是不管当前的类是否命中都会去处理加载
+                // 是不是没必要？而是先判断有没有命中在进行拦截器配置
+                aopConfig.setTargetClass(clazz);
+                aopConfig.setTarget(instance);
+
+                //符合PointCut的规则的话，创建代理对象
+                if(aopConfig.pointCutMatch()) {
+                    instance = createProxy(aopConfig).getProxy();
+                }
+
+                // 所以如果是代理对象的话，就直接返回代理对象，否则就返回实例对象
                 this.factoryBeanObjectCache.put(className, instance);
+                this.factoryBeanObjectCache.put(beanDefinition.getFactoryBeanName(),instance);
             }
             return instance;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
@@ -152,6 +172,27 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
             e.printStackTrace();
         }
         return null;
+    }
+
+    private GPAopProxy createProxy(GPAdvisedSupport config) {
+
+        Class<?> targetClass = config.getTargetClass();
+        // 如果有实现接口就使用JDK动态代理,反之使用CGLIB
+        if(targetClass.getInterfaces().length > 0){
+            return new GPJdkDynamicAopProxy(config);
+        }
+        return new GPCglibAopProxy(config);
+    }
+
+    private GPAdvisedSupport initializationAopConfig(GPBeanDefinition beanDefinition) {
+        GPAopConfig config = new GPAopConfig();
+        config.setPointCut(this.reader.getConfig().getProperty("pointCut"));
+        config.setAspectClass(this.reader.getConfig().getProperty("aspectClass"));
+        config.setAspectBefore(this.reader.getConfig().getProperty("aspectBefore"));
+        config.setAspectAfter(this.reader.getConfig().getProperty("aspectAfter"));
+        config.setAspectAfterThrow(this.reader.getConfig().getProperty("aspectAfterThrow"));
+        config.setAspectAfterThrowingName(this.reader.getConfig().getProperty("aspectAfterThrowingName"));
+        return new GPAdvisedSupport(config);
     }
 
     @Override

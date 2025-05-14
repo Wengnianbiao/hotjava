@@ -18,7 +18,7 @@ public class MyAction {
     @GPAutowired("queryServiceImpl")
     IQueryService queryService;
 
-    @GPAutowired("modifyServiceImpl")
+    @GPAutowired("modifyService")
     IModifyService modifyService;
 
 
