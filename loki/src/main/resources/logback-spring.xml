@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="INFO" monitorInterval="30">
+    <contextName>interfaceLog</contextName>
+
+    <springProperty name="appName" scope="context" source="spring.application.name" defaultValue="job"/>
+    <springProperty name="lokiUrl" scope="context" source="loki.url" defaultValue="http://127.0.0.1:3100"/>
+
+    <!-- 日志输出格式 -->
+    <property name="patternLayout" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] - %t - %logger{56}.%method:%L- :%m%n"/>
+
+    <!-- console: 控制台输出配置 -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <target>SYSTEM_OUT</target>
+        <encoder>
+            <pattern>${patternLayout}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http class="com.github.loki4j.logback.ApacheHttpSender">
+            <url>${lokiUrl}/loki/api/v1/push</url>
+            <connectionTimeoutMs>5000</connectionTimeoutMs>
+            <requestTimeoutMs>5000</requestTimeoutMs>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${appName}</pattern>
+            </label>
+            <message>
+                <pattern>%m</pattern>
+            </message>
+        </format>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="LOKI"/>
+    </root>
+
+</configuration>
