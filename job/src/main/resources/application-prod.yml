@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    jdbc-url: jdbc:mysql://127.0.0.1:3306/job?allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: weng@617
+    # 使用druid pool
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 10
+      max-active: 100
+      min-idle: 10

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.biao.job.quartzjob.mapper.BusinessTaskMapper">
+
+
+    <select id="selectAllTask" resultType="com.biao.job.quartzjob.model.dto.BusinessTaskDTO">
+        SELECT
+            id,
+            task_bean AS taskBean,
+            task_desc AS taskDesc,
+            cron_expression AS cronExpression,
+            open_status AS openStatus,
+            params,
+            latest_execute_time AS latestExecuteTime
+        FROM business_task
+    </select>
+</mapper>

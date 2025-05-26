@@ -1,0 +1,18 @@
+server:
+  port: 8802
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 100
+    max-connections: 100
+
+spring:
+  application:
+    name: job
+  profiles:
+    active: prod
+
+mybatis:
+  mapper-locations: classpath:mapper/*xml
+
