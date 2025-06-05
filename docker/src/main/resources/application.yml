@@ -1,0 +1,12 @@
+server:
+  port: 8805
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 100
+    max-connections: 100
+
+spring:
+  application:
+    name: docker

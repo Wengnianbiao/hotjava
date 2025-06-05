@@ -8,14 +8,117 @@
     <artifactId>hotjava</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
     <modules>
         <module>job</module>
+        <module>spring</module>
+        <module>loki</module>
+        <module>java</module>
+        <module>docker</module>
     </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <tk.mybatis.start.version>2.1.5</tk.mybatis.start.version>
         <spring-boot.version>2.3.2.RELEASE</spring-boot.version>
+        <mysql.connector.version>5.1.47</mysql.connector.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+        <!-- 引入swagger-bootstrap-ui依赖包-->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <!--swagger-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>2.9.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>2.9.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-common</artifactId>
+                <version>2.9.2</version>
+            </dependency>
+
+            <!-- 引入swagger-bootstrap-ui依赖包-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>1.8.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tk.mybatis</groupId>
+                <artifactId>mapper-spring-boot-starter</artifactId>
+                <version>${tk.mybatis.start.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>1.1.10</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>
